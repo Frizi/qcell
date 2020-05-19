@@ -147,10 +147,23 @@ impl<'id, T> LCell<'id, T> {
         }
     }
 
+    /// Borrow inner value. Mutable access to `LCell`
+    /// guarantees that there are no other active borrows.
+    #[inline]
+    pub fn get_mut(&mut self) -> &mut T {
+        unsafe { &mut *self.value.get() }
+    }
+
+    /// Unwraps the value.
+    #[inline]
+    pub fn into_inner(self) -> T {
+        self.value.into_inner()
+    }
+
     /// Get a pointer into the cell
-    /// 
+    ///
     /// # Safety
-    /// 
+    ///
     /// It is only safe to write to this pointer while the cell is
     /// not being held by a `ro` or `rw` lock.
     #[inline]

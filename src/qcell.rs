@@ -284,10 +284,23 @@ impl<T> QCell<T> {
         }
     }
 
+    /// Borrow inner value. Mutable access to `QCell`
+    /// guarantees that there are no other active borrows.
+    #[inline]
+    pub fn get_mut(&mut self) -> &mut T {
+        unsafe { &mut *self.value.get() }
+    }
+
+    /// Unwraps the value.
+    #[inline]
+    pub fn into_inner(self) -> T {
+        self.value.into_inner()
+    }
+
     /// Get a pointer into the cell
-    /// 
+    ///
     /// # Safety
-    /// 
+    ///
     /// It is only safe to write to this pointer while the cell is
     /// not being held by a `ro` or `rw` lock.
     #[inline]
@@ -314,7 +327,7 @@ mod tests {
         let other = QCellOwner::new();
         let c1 = QCell::new(&owner, 100u32);
         let c2 = QCell::new(&other, 200u32);
-        
+
         assert!(owner.owns(&c1));
         assert!(!owner.owns(&c2));
         assert!(!other.owns(&c1));
